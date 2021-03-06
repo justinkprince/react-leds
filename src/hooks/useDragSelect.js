@@ -1,6 +1,6 @@
 import { useState, useRef, createRef, useEffect } from "react";
 
-const useDragSelect = (itemData) => {
+const useDragSelect = (itemData = []) => {
   const initialItems = [];
   const initialGroups = [];
 

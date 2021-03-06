@@ -1,15 +1,18 @@
-import { useState, useRef, createRef } from "react";
+import { useState, useEffect, useRef, createRef } from "react";
+import { useSelector } from "react-redux";
 import Paper from "@material-ui/core/Paper";
 
-import config from "../../data/test-config";
+// import config from "../../data/test-config";
+import { selectLeds, selectShelves } from "../../store/configSlice";
 import Shelf from "./Shelf";
 import useDragSelect from "../../hooks/useDragSelect";
 
-const ledConfig = [...config.leds];
-const shelves = [...config.shelves];
-
 const LedConsole = () => {
-  const ledData = ledConfig.map((led, index) => {
+  const ledConfig = useSelector(selectLeds);
+  const shelfConfig = useSelector(selectShelves);
+  const [that, setThat] = useState(0);
+
+  const ledData = ledConfig?.map((led, index) => {
     return {
       id: index,
       group: led.group,
@@ -20,9 +23,22 @@ const LedConsole = () => {
     };
   });
 
-  const selectable = useDragSelect(ledData);
+  const selectable = useDragSelect();
 
   const leds = selectable.items;
+
+  useEffect(() => {
+    selectable.items = ledConfig;
+  }, [ledConfig]);
+
+  console.log(selectable.items);
+
+  if (selectable.items.length < 1) {
+    return <div onClick={() => setThat(that + 1)}>Loading {that}</div>;
+  }
+
+  const shelves = [...shelfConfig];
+
   const selectedLedIds = selectable.getSelectedItemIds();
   const { SelectionBox } = selectable;
 
@@ -57,17 +73,6 @@ const LedConsole = () => {
             />
           );
         })}
-
-        {/* <div className="shelf">
-          {leds.map(({ id, ref, props }) => (
-            <Led
-              key={id}
-              ref={ref}
-              isSelected={selectedLedIds.includes(id)}
-              {...props}
-            />
-          ))}
-        </div> */}
 
         <h1 style={{ color: "white" }}>{selectable.selectedItems.length}</h1>
         <h4 style={{ color: "white" }}>
